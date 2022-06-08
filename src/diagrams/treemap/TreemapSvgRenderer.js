@@ -45,49 +45,49 @@ class TreemapSvgRenderer {
         });
     }
     _popStart(array) {
-        if (array.length <= 1) return null
-        if (array.length <= 6) return null
-        return array.slice(-(array.length - 1))
-    }
-    _addRect(options, i) {
-        if (options.data === null) {
-            return;
+            if (array.length <= 1) return null
+            if (array.length <= 6) return null
+            return array.slice(-(array.length - 1))
         }
-        const rectAttr = {}
+        // _addRect(options, i) {
+        //     if (options.data === null) {
+        //         return;
+        //     }
+        //     const rectAttr = {}
 
-        if (this._preventRect.length) {
-            this._elementList.map(item => {
-                if (item.elem.attr.i == this._preventRect[0].i) {
-                    item.elem.attr.height = item.elem.attr.height / 2
-                    item.elem.attr.width += item.elem.attr.height / 2
+    //     if (this._preventRect.length) {
+    //         this._elementList.map(item => {
+    //             if (item.elem.attr.i == this._preventRect[0].i) {
+    //                 item.elem.attr.height = item.elem.attr.height / 2
+    //                 item.elem.attr.width += item.elem.attr.height / 2
 
-                    options.width = options.width * 1.5
-                    options.height = item.elem.attr.height
-                        // options.y = options.height
-                    console.log("FUCK")
-                }
+    //                 options.width = options.width * 1.5
+    //                 options.height = item.elem.attr.height
+    //                     // options.y = options.height
+    //                 console.log("FUCK")
+    //             }
 
-                return item
-            })
-        }
-        rectAttr.x = options.sx
-        rectAttr.y = options.sy
-        const aspectRatio = options.width / options.height;
-        const value = options.data[0]
-        rectAttr.data = value
-        rectAttr.i = i
-        if (aspectRatio > 0) {
-            rectAttr.width = 1.5 * (value / this._sum) * options.width / 2
-            rectAttr.height = options.height - 2
-        } else {
-            rectAttr.width = options.width - 2
-            rectAttr.height = 1.5 * (value / this._sum) * options.height / 2
-        }
-        this._preventRect.push(rectAttr)
-        this._elementList.push({ container: this._svgElem, elem: { name: "rect", attr: rectAttr } })
-        options.data = this._popStart(options.data)
-        this._addRect(options, i + 1)
-    }
+    //             return item
+    //         })
+    //     }
+    //     rectAttr.x = options.sx
+    //     rectAttr.y = options.sy
+    //     const aspectRatio = options.width / options.height;
+    //     const value = options.data[0]
+    //     rectAttr.data = value
+    //     rectAttr.i = i
+    //     if (aspectRatio > 0) {
+    //         rectAttr.width = 1.5 * (value / this._sum) * options.width / 2
+    //         rectAttr.height = options.height - 2
+    //     } else {
+    //         rectAttr.width = options.width - 2
+    //         rectAttr.height = 1.5 * (value / this._sum) * options.height / 2
+    //     }
+    //     this._preventRect.push(rectAttr)
+    //     this._elementList.push({ container: this._svgElem, elem: { name: "rect", attr: rectAttr } })
+    //     options.data = this._popStart(options.data)
+    //     this._addRect(options, i + 1)
+    // }
     draw() {
         // this._addRect({ sx: this._startX, ex: this._endX, sy: this._startY, ey: this._endY, width: this._width, height: this._height, data: this._data }, 1)
         // this._refresh()
@@ -95,21 +95,22 @@ class TreemapSvgRenderer {
 
         const result = getTreemap({
             data: [
-                { value: 6 },
-                { value: 6 },
-                { value: 4 },
-                { value: 3 },
-                { value: 2 },
-                { value: 2 },
-                { value: 1 },
+                { value: 432, color: "red" },
+                { value: 432, color: "blue" },
+                { value: 500, color: "brown" },
+                { value: 300, color: "grey" },
+                { value: 400, color: "black" },
+                { value: 124, color: "orange" },
+                { value: 1000, color: "yellow" },
             ],
-            width: 450,
-            height: 300
+            width: this._width,
+            height: this._height
         })
 
 
         result.forEach(res => {
-            this._elementList.push({ container: this._svgElem, elem: { name: "rect", attr: res } })
+
+            this._elementList.push({ container: this._svgElem, elem: { name: "rect", attr: { fill: res.data.color, ...res } } })
         })
         this._render()
     }
