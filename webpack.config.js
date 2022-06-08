@@ -37,12 +37,13 @@ module.exports = {
                 use: ['html-loader']
             },
             {
-                test: /\.(s[ac]|c)ss$/i,
+                test: /\.s[ac]ss$/i,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    // MiniCssExtractPlugin.loader,
+                    "style-loader",
                     'css-loader',
                     'postcss-loader',
-                    'sass-loader',
+                    'sass-loader'
                 ]
             },
             {
