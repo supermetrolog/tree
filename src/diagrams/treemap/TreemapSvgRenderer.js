@@ -40,8 +40,19 @@ class TreemapSvgRenderer {
 
     _render() {
         this._svgElem.innerHTML = ""
+        console.log(this._elementList)
         this._elementList.forEach(item => {
-            this._append(this._createElem(item.elem.name, item.elem.attr), item.container)
+            const newElem = this._createElem(item.elem.name, item.elem.attr)
+            this._append(newElem, item.container)
+            if (item.elem.inner) {
+                item.elem.inner.forEach(el => {
+                    const newNode = this._createElem(el.name, el.attr)
+                    this._append(document.createTextNode(el.textContent), newNode)
+                        // this._append(newNode, newElem)
+                    this._append(newNode, item.container)
+
+                });
+            }
         });
     }
     _popStart(array) {
@@ -88,21 +99,42 @@ class TreemapSvgRenderer {
     //     options.data = this._popStart(options.data)
     //     this._addRect(options, i + 1)
     // }
+
+    _normalizeData(data) {
+        let sortedData = data.sort((a, b) => {
+            if (a.value < b.value) {
+                return -1
+            }
+            if (a.value > b.value) {
+                return 1
+            }
+
+            return 0
+        })
+        let i = 1
+        sortedData.map((item) => item.value = i++)
+        return sortedData
+    }
     draw() {
         // this._addRect({ sx: this._startX, ex: this._endX, sy: this._startY, ey: this._endY, width: this._width, height: this._height, data: this._data }, 1)
         // this._refresh()
+
+        let data = [
+            { value: 6000, color: "red", valueOrigin: 6000 },
+            { value: 6000, color: "blue", valueOrigin: 6000 },
+            { value: 1250, color: "brown", valueOrigin: 1250 },
+            { value: 2500, color: "grey", valueOrigin: 2500 },
+            { value: 5000, color: "black", valueOrigin: 5000 },
+            { value: 3000, color: "orange", valueOrigin: 3000 },
+            { value: 200000, color: "rgb(100, 50, 70)", valueOrigin: 200000 },
+        ]
+
+        data = this._normalizeData(data)
+        console.log(data)
         const { getTreemap } = require('treemap-squarify')
 
         const result = getTreemap({
-            data: [
-                { value: 432, color: "red" },
-                { value: 432, color: "blue" },
-                { value: 500, color: "brown" },
-                { value: 300, color: "grey" },
-                { value: 400, color: "black" },
-                { value: 124, color: "orange" },
-                { value: 1000, color: "yellow" },
-            ],
+            data: data,
             width: this._width,
             height: this._height
         })
@@ -110,7 +142,22 @@ class TreemapSvgRenderer {
 
         result.forEach(res => {
 
-            this._elementList.push({ container: this._svgElem, elem: { name: "rect", attr: { fill: res.data.color, ...res } } })
+            this._elementList.push({
+                container: this._svgElem,
+                elem: {
+                    name: "rect",
+                    attr: { title: res.data.valueOrigin, fill: res.data.color, ...res },
+                    inner: [{
+                        name: "text",
+                        attr: {
+                            x: (res.x + res.width / 2) - (res.data.valueOrigin.toString().length / 2 * 8),
+                            y: (res.y + res.height / 2) + 10,
+                            fill: "white"
+                        },
+                        textContent: res.data.valueOrigin
+                    }]
+                }
+            })
         })
         this._render()
     }
